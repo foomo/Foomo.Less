@@ -31,11 +31,8 @@ class Module extends \Foomo\Modules\ModuleBase
 	// ~ Constants
 	//---------------------------------------------------------------------------------------------
 
-	/**
-	 * the name of this module
-	 *
-	 */
-	const NAME = 'Foomo.Less';
+	const NAME		= 'Foomo.Less';
+	const VERSION	= '1.0.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -62,7 +59,7 @@ class Module extends \Foomo\Modules\ModuleBase
 			\Foomo\Modules\Resource\CliCommand::getResource('lessc'),
 			\Foomo\Modules\Resource\CliCommand::getResource('recess'),
 			\Foomo\Modules\Resource\CliCommand::getResource('uglifycss'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo', self::VERSION),
+			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.0'),
 		);
 	}
 }

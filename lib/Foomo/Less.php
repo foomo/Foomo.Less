@@ -40,17 +40,13 @@ class Less
 	 */
 	private $source;
 	/**
-	 * @var float
-	 */
-	private $version;
-	/**
 	 * @var boolean
 	 */
 	private $watch = false;
 	/**
 	 * @var boolean
 	 */
-	private $uglify = true;
+	private $compress = true;
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Constructor
@@ -59,13 +55,11 @@ class Less
 	/**
 	 * @param string $module
 	 * @param string $source name of the less file
-	 * @param float $version update this, if you want a safe deployment
 	 */
-	public function __construct($module, $source, $version)
+	public function __construct($module, $source)
 	{
 		$this->module = $module;
 		$this->source = (substr($source, -5) != '.less') ? $source . '.less' : $source;
-		$this->version = $version;
 		if (!\file_exists($this->getSourceFilename())) \trigger_error ('Source does not exist: ' . $this->getSourceFilename (), \E_USER_ERROR);
 	}
 
@@ -90,14 +84,6 @@ class Less
 	}
 
 	/**
-	 * @return string
-	 */
-	public function getVersion()
-	{
-		return $this->version;
-	}
-
-	/**
 	 * @return boolean
 	 */
 	public function getWatch()
@@ -108,9 +94,9 @@ class Less
 	/**
 	 * @return boolean
 	 */
-	public function getUglify()
+	public function getCompress()
 	{
-		return $this->uglify;
+		return $this->compress;
 	}
 
 	/**
@@ -150,7 +136,9 @@ class Less
 	 */
 	public function getOutputBasename()
 	{
-		return $this->module . '-' . $this->source . '-' . $this->version . (($this->uglify) ? '-uglified' : '') . '.css';
+		$basename = $this->module . '-' . $this->source;
+		if ($this->compress) $basename .= '.min';
+		return  $basename . '.css';
 	}
 
 	/**
@@ -164,12 +152,12 @@ class Less
 	}
 
 	/**
-	 * @param boolean $uglify
+	 * @param boolean $compress
 	 * @return \Foomo\Less
 	 */
-	public function uglify($uglify=true)
+	public function compress($compress=true)
 	{
-		$this->uglify = $uglify;
+		$this->compress = $compress;
 		return $this;
 	}
 
@@ -190,8 +178,8 @@ class Less
 		}
 
 		if ($compile) {
-			$success = \Foomo\Less\Utils::compile($this->getSourceFilename(), $this->getOutputFilename());
-			if ($success && $this->uglify) \Foomo\Less\Utils::uglify($this->getOutputFilename(), $this->getOutputFilename());
+			$success = \Foomo\Less\Utils::compile($source, $output);
+			if ($success && $this->compress) \Foomo\Less\Utils::uglify($output, $output);
 		}
 
 		return $this;
@@ -204,12 +192,11 @@ class Less
 	/**
 	 * @param string $module
 	 * @param string $name name of the less file
-	 * @param float $version update this, if you want a safe deployment
 	 * @return \Foomo\Less
 	 */
-	public static function create($module, $source, $version)
+	public static function create($module, $source)
 	{
-		return new self($module, $source, $version);
+		return new self($module, $source);
 	}
 
 }
