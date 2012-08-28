@@ -46,7 +46,7 @@ class Less
 	/**
 	 * @var boolean
 	 */
-	private $compress = true;
+	private $compress = false;
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Constructor
