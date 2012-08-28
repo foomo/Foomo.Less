@@ -61,12 +61,13 @@ class Utils
 	public static function uglify($source, $destination)
 	{
 		# uglify
-		$call = \Foomo\CliCall\Uglifycss::create($source)->addArguments(array('>', $destination))->execute();
+		$cmd = \Foomo\CliCall\Uglifycss::create($source)->execute();
 		# validate
-		if ($call->exitStatus !== 0) {
-			\trigger_error('uglifying failed:' . $call->stdErr, E_USER_WARNING);
+		if ($cmd->exitStatus !== 0) {
+			\trigger_error('uglifying failed:' . $cmd->stdErr, E_USER_WARNING);
 			return false;
 		} else {
+			\file_put_contents($destination, $cmd->stdOut);
 			return true;
 		}
 	}
