@@ -34,11 +34,7 @@ class Less
 	/**
 	 * @var string
 	 */
-	private $module;
-	/**
-	 * @var string
-	 */
-	private $source;
+	private $filename;
 	/**
 	 * @var boolean
 	 */
@@ -53,14 +49,12 @@ class Less
 	//---------------------------------------------------------------------------------------------
 
 	/**
-	 * @param string $module
-	 * @param string $source name of the less file
+	 * @param string $filename
 	 */
-	public function __construct($module, $source)
+	public function __construct($filename)
 	{
-		$this->module = $module;
-		$this->source = (substr($source, -5) != '.less') ? $source . '.less' : $source;
-		if (!\file_exists($this->getSourceFilename())) \trigger_error ('Source does not exist: ' . $this->getSourceFilename (), \E_USER_ERROR);
+		$this->filename = $filename;
+		if (!\file_exists($this->filename)) \trigger_error ('Source does not exist: ' . $this->filename, \E_USER_ERROR);
 	}
 
 	//---------------------------------------------------------------------------------------------
@@ -72,7 +66,7 @@ class Less
 	 */
 	public function getModule()
 	{
-		return $this->module;
+		return $this->filename;
 	}
 
 	/**
@@ -102,17 +96,17 @@ class Less
 	/**
 	 * @return string
 	 */
-	public function getOutputPath()
+	public function getFilename()
 	{
-		return \Foomo\Less\Module::getHtdocsVarPath() . DIRECTORY_SEPARATOR . $this->getOutputBasename();
+		return $this->filename;
 	}
 
 	/**
 	 * @return string
 	 */
-	public function getSourceFilename()
+	public function getOutputPath()
 	{
-		return \Foomo\Config::getModuleDir($this->module) . DIRECTORY_SEPARATOR . 'less' . DIRECTORY_SEPARATOR . $this->source;
+		return \Foomo\Less\Module::getHtdocsVarPath() . DIRECTORY_SEPARATOR . $this->getOutputBasename();
 	}
 
 	/**
@@ -126,17 +120,9 @@ class Less
 	/**
 	 * @return string
 	 */
-	public function getSourceBasename()
-	{
-		return $this->source;
-	}
-
-	/**
-	 * @return string
-	 */
 	public function getOutputBasename()
 	{
-		$basename = $this->module . '-' . $this->source;
+		$basename = \md5($this->filename);
 		if ($this->compress) $basename .= '.min';
 		return  $basename . '.css';
 	}
@@ -166,7 +152,7 @@ class Less
 	 */
 	public function compile()
 	{
-		$source = $this->getSourceFilename();
+		$source = $this->getFilename();
 		$output = $this->getOutputFilename();
 
 		$compile = (!\file_exists($output));
@@ -190,13 +176,12 @@ class Less
 	//---------------------------------------------------------------------------------------------
 
 	/**
-	 * @param string $module
-	 * @param string $name name of the less file
+	 * @param string $filename Path to the less file
 	 * @return \Foomo\Less
 	 */
-	public static function create($module, $source)
+	public static function create($filename)
 	{
-		return new self($module, $source);
+		return new self($filename);
 	}
 
 }

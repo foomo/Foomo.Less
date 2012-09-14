@@ -32,7 +32,7 @@ class Module extends \Foomo\Modules\ModuleBase
 	//---------------------------------------------------------------------------------------------
 
 	const NAME		= 'Foomo.Less';
-	const VERSION	= '1.0.0';
+	const VERSION	= '1.1.0';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods

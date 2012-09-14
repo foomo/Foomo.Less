@@ -45,7 +45,7 @@ class Utils
 		$call = \Foomo\CliCall\Lessc::create($source, $destination)->execute();
 		# validate
 		if ($call->exitStatus !== 0) {
-			\unlink($destination);
+			if (\file_exists($destination)) \unlink($destination);
 			\trigger_error('lessc gave up' . $call->report, \E_USER_WARNING);
 			$ret = false;
 		}
@@ -64,6 +64,7 @@ class Utils
 		$cmd = \Foomo\CliCall\Uglifycss::create($source)->execute();
 		# validate
 		if ($cmd->exitStatus !== 0) {
+			if (\file_exists($destination)) \unlink($destination);
 			\trigger_error('uglifying failed:' . $cmd->stdErr, E_USER_WARNING);
 			return false;
 		} else {
