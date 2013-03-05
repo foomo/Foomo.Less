@@ -201,6 +201,7 @@ class Recess extends \Foomo\CliCall
 	 */
 	public static function create()
 	{
-		return new self();
+		$source = func_get_arg(0);
+		return new self($source);
 	}
 }

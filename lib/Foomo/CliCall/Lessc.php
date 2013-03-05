@@ -62,8 +62,10 @@ class Lessc extends \Foomo\CliCall
 	 * @param string $destination
 	 * @return \Foomo\CliCall\Lessc
 	 */
-	public static function create($source, $destination)
+	public static function create()
 	{
+		$source = func_get_arg(0);
+		$destination = func_get_arg(1);
 		return new self($source, $destination);
 	}
 }
