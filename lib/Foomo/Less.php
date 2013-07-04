@@ -106,7 +106,7 @@ class Less
 	 */
 	public function getOutputPath()
 	{
-		return \Foomo\Less\Module::getHtdocsVarPath() . DIRECTORY_SEPARATOR . $this->getOutputBasename();
+		return \Foomo\Less\Module::getHtdocsVarBuildPath() . DIRECTORY_SEPARATOR . $this->getOutputBasename();
 	}
 
 	/**
