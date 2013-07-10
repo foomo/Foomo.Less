@@ -40,6 +40,10 @@ class Less
 	 */
 	private $watch = false;
 	/**
+	 * @var string
+	 */
+	private $name = '';
+	/**
 	 * @var boolean
 	 */
 	private $compress = false;
@@ -69,6 +73,15 @@ class Less
 		return $this->filename;
 	}
 
+	/**
+	 * @param $name
+	 * @return $this
+	 */
+	public function name($name)
+	{
+		$this->name = $name;
+		return $this;
+	}
 	/**
 	 * @return string
 	 */
@@ -124,7 +137,11 @@ class Less
 	{
 		$basename = \md5($this->filename);
 		if ($this->compress) $basename .= '.min';
-		return  $basename . '.css';
+		if(empty($this->name)) {
+			return  $basename . '.css';
+		} else {
+			return  $this->name . '-' . $basename . '.css';
+		}
 	}
 
 	/**
