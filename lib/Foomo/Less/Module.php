@@ -33,7 +33,7 @@ class Module extends \Foomo\Modules\ModuleBase
 	//---------------------------------------------------------------------------------------------
 
 	const NAME		= 'Foomo.Less';
-	const VERSION	= '1.1.0';
+	const VERSION	= '1.1.1';
 
 	//---------------------------------------------------------------------------------------------
 	// ~ Overriden static methods
@@ -60,7 +60,7 @@ class Module extends \Foomo\Modules\ModuleBase
 			\Foomo\Modules\Resource\CliCommand::getResource('lessc'),
 			\Foomo\Modules\Resource\CliCommand::getResource('recess'),
 			\Foomo\Modules\Resource\CliCommand::getResource('uglifycss'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.0'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*')
 		);
 	}
 	public static function make($target, MakeResult $result)
