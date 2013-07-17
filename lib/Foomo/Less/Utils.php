@@ -130,9 +130,10 @@ class Utils
 	private static function pregMatch($filename)
 	{
 		$matches = array();
-		//\preg_match_all('/^@import *["\'](.*?)["\']/im', \file_get_contents($filename), $matches);
-		\preg_match_all('/^\s*@import *["\'](.*?)["\']/im', \file_get_contents($filename), $matches);
-		return $matches;
+		//\preg_match_all('/^\s*@import *["\'](.*?)["\']/im', \file_get_contents($filename), $matches);
+		//return $matches;
+		\preg_match_all('/^\s*@import\s*(["\'])(.*?)\1/im', \file_get_contents($filename), $matches);
+		return array($matches[0], $matches[2]);
 	}
 
 	/**
