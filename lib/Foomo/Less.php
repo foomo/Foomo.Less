@@ -163,11 +163,7 @@ class Less
 		$this->compress = $compress;
 		return $this;
 	}
-
-	/**
-	 * @return \Foomo\Less
-	 */
-	public function compile()
+	private function needsCompilation()
 	{
 		$source = $this->getFilename();
 		$output = $this->getOutputFilename();
@@ -179,10 +175,24 @@ class Less
 			$cmd = \Foomo\CliCall\Find::create($deps)->type('f')->newer($output)->execute();
 			if (!empty($cmd->stdOut)) $compile = true;
 		}
+		return $compile;
+	}
+	/**
+	 * @return \Foomo\Less
+	 */
+	public function compile()
+	{
+		$output = $this->getOutputFilename();
 
-		if ($compile) {
+		if (
+			$this->needsCompilation() &&
+			Lock::lock($lockName = 'LESS-' . basename($output)) &&
+			$this->needsCompilation()
+		) {
+			$source = $this->getFilename();
 			$success = \Foomo\Less\Utils::compile($source, $output);
 			if ($success && $this->compress) \Foomo\Less\Utils::uglify($output, $output);
+			Lock::release($lockName);
 		}
 
 		return $this;
