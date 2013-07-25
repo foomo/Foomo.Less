@@ -211,4 +211,28 @@ class Less
 		return new self($filename);
 	}
 
+	//---------------------------------------------------------------------------------------------
+	// Private static methods
+	//---------------------------------------------------------------------------------------------
+
+	private static function sourceMaps()
+	{
+		return;
+		$call = new \Foomo\CliCall(\Foomo\Less\Module::getVendorDir('less.js/bin/lessc'), array(
+			'--source-map=' . ($map = \Foomo\Less\Module::getHtdocsDir('test.map')),
+			\Foomo\Less\Module::getBaseDir('less/demo.less'),
+			$css = \Foomo\Less\Module::getHtdocsDir('test.css')
+		));
+		$call->execute();
+		file_put_contents(
+			$css,
+			str_replace(
+				'/*# sourceMappingURL=' . $map . ' */',
+				'/*# sourceMappingURL=' . basename($map) . ' */',
+				file_get_contents($css)
+			)
+		);
+
+	}
+
 }
