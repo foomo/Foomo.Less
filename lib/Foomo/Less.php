@@ -189,8 +189,16 @@ class Less
 			Lock::lock($lockName = 'LESS-' . basename($output)) &&
 			$this->needsCompilation()
 		) {
-			$source = $this->getFilename();
-			$success = \Foomo\Less\Utils::compile($source, $output);
+			//$source = $this->getFilename();
+			//$success = \Foomo\Less\Utils::compile($source, $output);
+
+			$call = $this->sourceMapsCompile();
+			$success = $call->exitStatus == 0;
+			if(!$success) {
+				MVC::abort();
+				echo $call->report;
+				exit;
+			}
 			if ($success && $this->compress) \Foomo\Less\Utils::uglify($output, $output);
 			Lock::release($lockName);
 		}
@@ -215,24 +223,30 @@ class Less
 	// Private static methods
 	//---------------------------------------------------------------------------------------------
 
-	private static function sourceMaps()
+	private function sourceMapsCompile()
 	{
-		return;
-		$call = new \Foomo\CliCall(\Foomo\Less\Module::getVendorDir('less.js/bin/lessc'), array(
-			'--source-map=' . ($map = \Foomo\Less\Module::getHtdocsDir('test.map')),
-			\Foomo\Less\Module::getBaseDir('less/demo.less'),
-			$css = \Foomo\Less\Module::getHtdocsDir('test.css')
-		));
-		$call->execute();
+		$css = $this->getOutputFilename();
+		$map = $css . '.map';
+		return \Foomo\CliCall::create(
+				'lessc',
+				array(
+					'--source-map=' . $map,
+					'--source-map-rootpath=' . Less\Module::getHtdocsPath() . 'sourceServer.php',
+					$this->filename,
+					$css
+				)
+			)->execute()
+		;
+		/*
 		file_put_contents(
 			$css,
 			str_replace(
-				'/*# sourceMappingURL=' . $map . ' */',
-				'/*# sourceMappingURL=' . basename($map) . ' */',
+				'*# sourceMappingURL=' . $map . ' *',
+				'*# sourceMappingURL=' . basename($map) . ' *',
 				file_get_contents($css)
 			)
 		);
-
+		*/
 	}
 
 }
