@@ -18,6 +18,7 @@
  */
 
 namespace Foomo;
+use Foomo\TypeScript\SourceServer;
 
 /**
  * @link www.foomo.org
@@ -190,8 +191,24 @@ class Less
 			$this->needsCompilation()
 		) {
 			$source = $this->getFilename();
-			$success = \Foomo\Less\Utils::compile($source, $output);
-			if ($success && $this->compress) \Foomo\Less\Utils::uglify($output, $output);
+			if($this->compress) {
+				$success = \Foomo\Less\Utils::compile($source, $output);
+			} else {
+				$call = $this->sourceMapsCompile();
+				$success = $call->exitStatus == 0;
+				Less\SourceServer::fixSourcemap($this->getOutputFilename(), Less\Module::NAME);
+			}
+
+			if(!$success) {
+				MVC::abort();
+				echo $call->report;
+				exit;
+			}
+			if ($success) {
+				if($this->compress) {
+					\Foomo\Less\Utils::uglify($output, $output);
+				}
+			}
 			Lock::release($lockName);
 		}
 
@@ -215,24 +232,31 @@ class Less
 	// Private static methods
 	//---------------------------------------------------------------------------------------------
 
-	private static function sourceMaps()
+	private function sourceMapsCompile()
 	{
-		return;
-		$call = new \Foomo\CliCall(\Foomo\Less\Module::getVendorDir('less.js/bin/lessc'), array(
-			'--source-map=' . ($map = \Foomo\Less\Module::getHtdocsDir('test.map')),
-			\Foomo\Less\Module::getBaseDir('less/demo.less'),
-			$css = \Foomo\Less\Module::getHtdocsDir('test.css')
-		));
-		$call->execute();
-		file_put_contents(
-			$css,
-			str_replace(
-				'/*# sourceMappingURL=' . $map . ' */',
-				'/*# sourceMappingURL=' . basename($map) . ' */',
-				file_get_contents($css)
-			)
-		);
-
+		$css = $this->getOutputFilename();
+		$map = $css . '.map';
+		$cmd = \Foomo\CliCall::create(
+				'lessc',
+				array(
+					'--source-map=' . $map,
+					'--source-map-rootpath=' . dirname($this->filename),
+					$this->filename,
+					$css
+				)
+			)->execute()
+		;
+		//return $cmd;
+		if($cmd->exitStatus === 0) {
+			$lines = explode(PHP_EOL, file_get_contents($css));
+			array_pop($lines);
+			array_push($lines, '/*# sourceMappingURL='  . basename($map) . ' */'); //Less\Module::getHtdocsVarBuildPath() . '/'
+			file_put_contents(
+				$css,
+				implode(PHP_EOL, $lines)
+			);
+		}
+		return $cmd;
 	}
 
 }
