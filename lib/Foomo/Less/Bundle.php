@@ -36,13 +36,16 @@ class Bundle extends \Foomo\Bundle\AbstractBundle
 	public function compile(Result $result)
 	{
 		$lessCompiler = Less::create($this->less)
+			->watch($this->debug)
 			->name($this->name)
 			->compress(!$this->debug)
 			->compile()
 		;
-		$result->mimeType = Result::MIME_TYPE_CSS;
-		$result->files[] = $lessCompiler->getOutputFilename();
-		$result->links[] = $lessCompiler->getOutputPath();
+		$result->resources[] = Result\Resource::create(
+			Result\Resource::MIME_TYPE_CSS,
+			$lessCompiler->getOutputFilename(),
+			$lessCompiler->getOutputPath()
+		);
 		return $this;
 	}
 
@@ -65,5 +68,8 @@ class Bundle extends \Foomo\Bundle\AbstractBundle
 		}
 		return $css;
 	}
-
+	public static function canMerge($mimeType)
+	{
+		return $mimeType == Result\Resource::MIME_TYPE_CSS;
+	}
 }

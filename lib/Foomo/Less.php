@@ -18,6 +18,7 @@
  */
 
 namespace Foomo;
+use Foomo\TypeScript\SourceServer;
 
 /**
  * @link www.foomo.org
@@ -189,17 +190,25 @@ class Less
 			Lock::lock($lockName = 'LESS-' . basename($output)) &&
 			$this->needsCompilation()
 		) {
-			//$source = $this->getFilename();
-			//$success = \Foomo\Less\Utils::compile($source, $output);
+			$source = $this->getFilename();
+			if($this->compress) {
+				$success = \Foomo\Less\Utils::compile($source, $output);
+			} else {
+				$call = $this->sourceMapsCompile();
+				$success = $call->exitStatus == 0;
+				Less\SourceServer::fixSourcemap($this->getOutputFilename(), Less\Module::NAME);
+			}
 
-			$call = $this->sourceMapsCompile();
-			$success = $call->exitStatus == 0;
 			if(!$success) {
 				MVC::abort();
 				echo $call->report;
 				exit;
 			}
-			if ($success && $this->compress) \Foomo\Less\Utils::uglify($output, $output);
+			if ($success) {
+				if($this->compress) {
+					\Foomo\Less\Utils::uglify($output, $output);
+				}
+			}
 			Lock::release($lockName);
 		}
 
@@ -227,26 +236,27 @@ class Less
 	{
 		$css = $this->getOutputFilename();
 		$map = $css . '.map';
-		return \Foomo\CliCall::create(
+		$cmd = \Foomo\CliCall::create(
 				'lessc',
 				array(
 					'--source-map=' . $map,
-					'--source-map-rootpath=' . Less\Module::getHtdocsPath() . 'sourceServer.php',
+					'--source-map-rootpath=' . dirname($this->filename),
 					$this->filename,
 					$css
 				)
 			)->execute()
 		;
-		/*
-		file_put_contents(
-			$css,
-			str_replace(
-				'*# sourceMappingURL=' . $map . ' *',
-				'*# sourceMappingURL=' . basename($map) . ' *',
-				file_get_contents($css)
-			)
-		);
-		*/
+		//return $cmd;
+		if($cmd->exitStatus === 0) {
+			$lines = explode(PHP_EOL, file_get_contents($css));
+			array_pop($lines);
+			array_push($lines, '/*# sourceMappingURL='  . basename($map) . ' */'); //Less\Module::getHtdocsVarBuildPath() . '/'
+			file_put_contents(
+				$css,
+				implode(PHP_EOL, $lines)
+			);
+		}
+		return $cmd;
 	}
 
 }
