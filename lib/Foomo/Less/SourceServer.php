@@ -19,9 +19,6 @@
 
 namespace Foomo\Less;
 
-use Foomo\Config;
-use Foomo\Modules\Manager;
-
 /**
  * this one is not ready yet
  * @link www.foomo.org

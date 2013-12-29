@@ -18,7 +18,6 @@
  */
 
 namespace Foomo;
-use Foomo\TypeScript\SourceServer;
 
 /**
  * @link www.foomo.org
@@ -201,6 +200,7 @@ class Less
 
 			if(!$success) {
 				MVC::abort();
+				header('Content-Type: text/plain;charset=utf-8;');
 				echo $call->report;
 				exit;
 			}
