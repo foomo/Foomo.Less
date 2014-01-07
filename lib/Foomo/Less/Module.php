@@ -68,9 +68,9 @@ class Module extends \Foomo\Modules\ModuleBase
 	{
 		switch($target) {
 			case 'clean':
-				$result->addEntry('cleaning css files in ' . self::getHtdocsVarDir());
+				$result->addEntry('cleaning css files and source maps in ' . self::getHtdocsVarDir());
 				foreach(new \DirectoryIterator(self::getHtdocsVarDir()) as $fileInfo) {
-					if($fileInfo->isFile() && substr($fileInfo->getFilename(), -4) == '.css') {
+					if($fileInfo->isFile() && in_array(substr($fileInfo->getFilename(), -4), array('.css', '.map'))) {
 						if(unlink($fileInfo->getPathname())) {
 							$result->addEntry('removed ' . $fileInfo->getFilename());
 						} else {
