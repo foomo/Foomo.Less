@@ -60,7 +60,8 @@ class Module extends \Foomo\Modules\ModuleBase
 			\Foomo\Modules\Resource\CliCommand::getResource('lessc'),
 			\Foomo\Modules\Resource\CliCommand::getResource('recess'),
 			\Foomo\Modules\Resource\CliCommand::getResource('uglifycss'),
-			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*')
+			\Foomo\Modules\Resource\Module::getResource('Foomo', '0.3.*'),
+			\Foomo\Modules\Resource\Module::getResource('Foomo.Bundle', '0.1.*')
 		);
 	}
 	public static function make($target, MakeResult $result)
